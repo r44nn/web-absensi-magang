@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { exportData } = require('../controllers/export_Controllers');
 const auth = require('../middleware/auth_Middleware');
+const { exportAbsensiCutiToExcel } = require('../controllers/export_Controllers');
 
-router.get('/data', auth, exportData);
+router.get('/absensi-cuti/excel', auth, exportAbsensiCutiToExcel);
 
 module.exports = router;

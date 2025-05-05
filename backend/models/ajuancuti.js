@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 
-const AjuancutiSchema = new mongoose.Schema({
+const AjuanCutiSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    tanggalMulai: { type: Date },
-    tanggalSelesai: { type: Date },
+    tanggalMulai: { type: Date, required: true },
+    tanggalSelesai: { type: Date, required: true },
     alasan: { type: String },
-    status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' }
+    jenisCuti: { type: String, enum: ['sakit', 'izin', 'cuti'], required: true },
+    status: { type: String, default: 'Pending' },
+    approvedAt: { type: Date },
+    rejectedAt: { type: Date }
 });
 
-module.exports = mongoose.model('Ajuancuti', AjuancutiSchema);
+module.exports = mongoose.model('Ajuancuti', AjuanCutiSchema);

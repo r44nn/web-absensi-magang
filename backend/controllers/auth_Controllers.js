@@ -32,21 +32,18 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     try {
-        // Cari pengguna berdasarkan email
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ msg: 'Invalid Credentials' });
 
-        // Bandingkan password dengan yang ada di database
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ msg: 'Invalid Credentials' });
 
-        // Buat payload yang berisi id dan role pengguna
-        const payload = { user: { id: user.id, role: user.role } };
+        // ✅ Ubah payload agar langsung menyimpan id dan role
+        const payload = { id: user.id, role: user.role };
 
-        // Generate token JWT dan kirimkan respons bersama role
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
             if (err) throw err;
-            res.json({ token, role: user.role });
+            res.json({ token, role: user.role }); // Kirim juga role agar client tahu
         });
     } catch (err) {
         res.status(500).send('Server error');
