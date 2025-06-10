@@ -1,4 +1,5 @@
 const Ajuancuti = require('../models/ajuancuti.js');
+const Absensi = require('../models/absensi'); // Import model Absensi
 
 exports.submitCuti = async (req, res) => {
     try {
@@ -18,7 +19,7 @@ exports.submitCuti = async (req, res) => {
         });
 
         await cuti.save();
-        res.json({ msg: 'Leave application submitted' });
+        res.json({ msg: 'Pengajuan cuti telah dikirim !' });
     } catch (err) {
         console.error('Submit cuti error:', err);
         res.status(500).send('Server error');
@@ -26,17 +27,20 @@ exports.submitCuti = async (req, res) => {
 };
 
 exports.manageCuti = async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-
-        const allCuti = await Ajuancuti.find().populate('user', 'username email');
-        res.json(allCuti);
-    } catch (err) {
-        console.error('Manage cuti error:', err);
-        res.status(500).send('Server error');
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Admin only.' });
     }
+
+    const allCuti = await Ajuancuti.find()
+      .populate('user', 'nama email') // ✅ perbaikan di sini
+      .sort({ createdAt: -1 });       // opsional: urutkan terbaru dulu
+
+    res.json(allCuti);
+  } catch (err) {
+    console.error('Manage cuti error:', err);
+    res.status(500).send('Server error');
+  }
 };
 
 

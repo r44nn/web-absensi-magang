@@ -4,58 +4,74 @@ const AjuanCuti = require('../models/ajuancuti');
 
 exports.checkIn = async (req, res) => {
     try {
-        const now = new Date();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set jadi awal hari
-
-        const existingAbsensi = await Absensi.findOne({
-            user: req.user.id,
-            tanggal: today,
-            checkOut: null
-        });
-
-        if (existingAbsensi) {
-            return res.status(400).json({ msg: 'You have already checked in today and not checked out yet.' });
-        }
-
-        const absensi = new Absensi({
-            user: req.user.id,
-            tanggal: today, // simpan tanggal eksplisit
-            checkIn: now
-        });
-
-        await absensi.save();
-        res.json({ msg: 'Checked in successfully' });
+      const now = new Date();
+  
+      // Buat tanggal awal hari (misal: 2025-05-07 00:00:00)
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+  
+      // Buat tanggal akhir hari (misal: 2025-05-07 23:59:59)
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999);
+  
+      // Cek apakah sudah check-in hari ini
+      const alreadyCheckedIn = await Absensi.findOne({
+        user: req.user.id,
+        tanggal: {
+          $gte: todayStart,
+          $lte: todayEnd,
+        },
+      });
+  
+      if (alreadyCheckedIn) {
+        return res.status(400).json({ msg: "Kamu sudah check-in hari ini." });
+      }
+  
+      // Simpan absensi baru
+      const absensi = new Absensi({
+        user: req.user.id,
+        tanggal: now,
+        checkIn: now,
+      });
+  
+      await absensi.save();
+      res.json({ msg: "Check-in berhasil!" });
     } catch (err) {
-        res.status(500).send('Server error');
+      console.error(err);
+      res.status(500).send("Server error");
     }
-};
-
-exports.checkOut = async (req, res) => {
+  };
+  
+  exports.checkOut = async (req, res) => {
     try {
-        const now = new Date();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const absensi = await Absensi.findOne({
-            user: req.user.id,
-            tanggal: today,
-            checkOut: null
-        });
-
-        if (!absensi) {
-            return res.status(400).json({ msg: 'No active check-in found for today' });
-        }
-
-        absensi.checkOut = now;
-        await absensi.save();
-
-        res.json({ msg: 'Checked out successfully' });
+      const now = new Date();
+  
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+  
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+  
+      const absensi = await Absensi.findOne({
+        user: req.user.id,
+        tanggal: { $gte: startOfDay, $lte: endOfDay },
+        checkOut: null
+      });
+  
+      if (!absensi) {
+        return res.status(400).json({ msg: 'Sudah Check Out !' });
+      }
+  
+      absensi.checkOut = now;
+      await absensi.save();
+  
+      res.json({ msg: 'Checked out Berhasil !' });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+      console.error(err);
+      res.status(500).send('Server error');
     }
-};
+  };
+  
 
 exports.history = async (req, res) => {
     try {
@@ -88,51 +104,53 @@ exports.history = async (req, res) => {
 };
 
 exports.getAllAbsensi = async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ msg: 'Access denied. Admin only.' });
-        }
-
-        const { nama } = req.query; // tangkap keyword dari URL ?nama=...
-
-        // Siapkan query dasar
-        let query = {};
-
-        if (nama) {
-            // Cari berdasarkan nama user (case insensitive)
-            query = {
-                ...query,
-                // gunakan regex untuk pencarian parsial
-                $or: [
-                    { 'user.nama': { $regex: nama, $options: 'i' } }
-                ]
-            };
-        }
-
-        // Join ke data user
-        const data = await Absensi.find()
-            .populate('user', 'nama email')
-            .sort({ tanggal: -1 });
-
-        // Filter di level JS (karena Mongoose tidak bisa query field populated langsung pakai regex)
-        const filtered = data.filter(item =>
-            !nama || item.user.nama.toLowerCase().includes(nama.toLowerCase())
-        );
-
-        const result = filtered.map(item => ({
-            nama: item.user.nama,
-            email: item.user.email,
-            tanggal: item.tanggal.toISOString().split('T')[0],
-            checkIn: item.checkIn ? new Date(item.checkIn).toTimeString().slice(0, 5) : '-',
-            checkOut: item.checkOut ? new Date(item.checkOut).toTimeString().slice(0, 5) : '00:00',
-            status: item.checkOut ? 'Hadir' : 'Pending'
-        }));
-
-        res.json(result);
-    } catch (err) {
-        console.error('Admin getAllAbsensi error:', err);
-        res.status(500).json({ msg: 'Server error' });
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ msg: 'Access denied. Admin only.' });
     }
+
+    const { nama, tanggal } = req.query;
+
+    // Filter tanggal (jika ada)
+    let dateFilter = {};
+    if (tanggal) {
+      const start = new Date(tanggal);
+      const end = new Date(tanggal);
+      end.setDate(end.getDate() + 1);
+
+      dateFilter = {
+        tanggal: {
+          $gte: start,
+          $lt: end
+        }
+      };
+    }
+
+    // Ambil data absensi berdasarkan filter tanggal
+    const data = await Absensi.find(dateFilter)
+      .populate('user', 'nama email')
+      .sort({ tanggal: -1 });
+
+    // Filter berdasarkan nama jika ada
+    const filtered = data.filter(item =>
+      !nama || item.user.nama.toLowerCase().includes(nama.toLowerCase())
+    );
+
+    // Format hasil
+    const result = filtered.map(item => ({
+      nama: item.user.nama,
+      email: item.user.email,
+      tanggal: item.tanggal.toISOString().split('T')[0],
+      checkIn: item.checkIn ? new Date(item.checkIn).toTimeString().slice(0, 5) : '-',
+      checkOut: item.checkOut ? new Date(item.checkOut).toTimeString().slice(0, 5) : '00:00',
+      status: item.checkOut ? 'Hadir' : 'Pending'
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error('Admin getAllAbsensi error:', err);
+    res.status(500).json({ msg: 'Server error' });
+  }
 };
 
 const ExcelJS = require('exceljs');
@@ -225,3 +243,53 @@ exports.getStatistikAbsensiUser = async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 };
+
+exports.getAktivitasHariIni = async (req, res) => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const besok = new Date(today);
+      besok.setDate(today.getDate() + 1);
+  
+      const absensi = await Absensi.find({
+        tanggal: { $gte: today, $lt: besok },
+      }).populate("user", "nama");
+  
+      const izin = await AjuanCuti.find({
+        createdAt: { $gte: today, $lt: besok },
+      }).populate("user", "nama");
+  
+      const logAbsensi = absensi.flatMap((a) => {
+        const logs = [];
+        if (a.checkIn)
+          logs.push({
+            nama: a.user.nama,
+            aktivitas: "Check-in",
+            waktu: a.checkIn,
+          });
+        if (a.checkOut)
+          logs.push({
+            nama: a.user.nama,
+            aktivitas: "Check-out",
+            waktu: a.checkOut,
+          });
+        return logs;
+      });
+  
+      const logIzin = izin.map((i) => ({
+        nama: i.user.nama,
+        aktivitas: "Pengajuan Izin",
+        waktu: i.createdAt,
+      }));
+  
+      const hasilGabung = [...logAbsensi, ...logIzin].sort(
+        (a, b) => new Date(a.waktu) - new Date(b.waktu)
+      );
+  
+      res.json(hasilGabung);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "Gagal memuat aktivitas hari ini" });
+    }
+  };
+  

@@ -7,7 +7,7 @@ exports.register = async (req, res) => {
     try {
         // Cek apakah email sudah ada
         let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ msg: 'User already exists' });
+        if (user) return res.status(400).json({ msg: 'User Sudah Ada !' });
 
         // Validasi role jika diberikan, hanya boleh 'admin' atau 'user'
         if (role && !['admin', 'user'].includes(role)) {
@@ -49,3 +49,14 @@ exports.login = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+exports.getUserProfile = async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id).select("nama email role");
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ msg: "Server error" });
+    }
+  };
+  
+  
