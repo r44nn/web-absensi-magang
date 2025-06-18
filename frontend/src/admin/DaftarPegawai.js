@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FaSearch, FaRedoAlt, FaTrashAlt, FaTimes } from "react-icons/fa";
 
-// Komponen utama daftar pegawai
 export default function DaftarPegawai() {
   const [pegawai, setPegawai] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-
-  // State untuk modal konfirmasi
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
+  // debounce ref
+  const searchRef = useRef(null);
+
   const fetchPegawai = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get("http://localhost:8000/api/users/pegawai", {
@@ -26,13 +28,24 @@ export default function DaftarPegawai() {
     }
   };
 
-  // Tampilkan modal konfirmasi hapus
+  useEffect(() => {
+    fetchPegawai();
+  }, []);
+
+  const handleSearch = (e) => {
+    const v = e.target.value;
+    clearTimeout(searchRef.current);
+    setSearch(v);
+    searchRef.current = setTimeout(() => {
+      // no server filter, kept client-side
+    }, 300);
+  };
+
   const handleHapus = (id) => {
     setSelectedId(id);
     setShowConfirm(true);
   };
 
-  // Jika user mengonfirmasi hapus
   const konfirmasiHapus = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -49,103 +62,142 @@ export default function DaftarPegawai() {
     }
   };
 
-  useEffect(() => {
-    fetchPegawai();
-  }, []);
-
-  const filteredPegawai = pegawai.filter((p) =>
-    p.nama.toLowerCase().includes(search.toLowerCase()) ||
-    p.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = pegawai.filter(
+    (p) =>
+      p.nama.toLowerCase().includes(search.toLowerCase()) ||
+      p.email.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 px-6 py-10 font-sans">
-      <div className="max-w-5xl mx-auto">
-        {/* Header dan pencarian */}
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">Daftar Pegawai</h1>
-          <div className="relative w-full max-w-xs">
-            <input
-              type="text"
-              placeholder="Cari pegawai..."
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <div className="absolute left-3 top-2.5 w-2 h-2 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 16.65z" />
-              </svg>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Hero Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-lg shadow-lg">
+          <h1 className="text-2xl md:text-3xl font-bold">Daftar Pegawai</h1>
+          <p className="mt-1 opacity-90">
+            Kelola data pegawai—cari atau hapus dengan mudah.
+          </p>
         </div>
 
-        {/* Tabel Pegawai */}
-        <div className="bg-white shadow-md rounded-xl overflow-hidden">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+        {/* Search Panel */}
+        <div className="bg-white/60 backdrop-blur-md rounded-lg p-4 shadow-md flex flex-col sm:flex-row items-end sm:items-center gap-4">
+          <div className="relative flex-1">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={handleSearch}
+              placeholder="Cari nama atau email..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+            />
+          </div>
+          <button
+            onClick={fetchPegawai}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+          >
+            <FaRedoAlt /> Muat Ulang
+          </button>
+        </div>
+
+        {/* Table */}
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <table className="min-w-full table-auto">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="p-4">No</th>
-                <th className="p-4">Nama Lengkap</th>
-                <th className="p-4">Email</th>
-                <th className="p-4 text-left">Aksi</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                  No
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                  Nama Lengkap
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                  Email
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {loading
+                ? Array.from({ length: 10 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      {Array(4)
+                        .fill(0)
+                        .map((_, j) => (
+                          <td key={j} className="px-4 py-3">
+                            <div className="h-4 bg-gray-200 rounded"></div>
+                          </td>
+                        ))}
+                    </tr>
+                  ))
+                : filtered.map((item, idx) => (
+                    <tr
+                      key={item._id}
+                      className={`${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition`}
+                    >
+                      <td className="px-4 py-3">{idx + 1}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800">
+                        {item.nama}
+                      </td>
+                      <td className="px-4 py-3">{item.email}</td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => handleHapus(item._id)}
+                          className="flex items-center gap-2 text-red-600 hover:text-red-800"
+                        >
+                          <FaTrashAlt /> Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              {!loading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="p-6 text-center text-gray-500 italic">
-                    Memuat data...
+                  <td
+                    colSpan={4}
+                    className="px-4 py-8 text-center text-gray-400"
+                  >
+                    Tidak ada pegawai ditemukan.
                   </td>
                 </tr>
-              ) : filteredPegawai.length === 0 ? (
-                <tr>
-                  <td colSpan="4" className="p-6 text-center text-gray-400 italic">
-                    Tidak ada data pegawai
-                  </td>
-                </tr>
-              ) : (
-                filteredPegawai.map((item, idx) => (
-                  <tr key={item._id} className="border-t hover:bg-gray-50 transition-all">
-                    <td className="p-4">{idx + 1}</td>
-                    <td className="p-4 font-medium text-gray-800">{item.nama}</td>
-                    <td className="p-4">{item.email}</td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => handleHapus(item._id)}
-                        className="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-full text-xs flex items-center gap-1"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3H4m16 0H4" />
-                        </svg>
-                        Hapus
-                      </button>
-                    </td>
-                  </tr>
-                ))
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Modal Konfirmasi */}
+        {/* Confirmation Modal */}
         {showConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-96">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Penghapusan</h2>
-              <p className="text-sm text-gray-600 mb-6">
-                Apakah kamu yakin ingin menghapus pegawai ini? Semua data terkait akan terhapus secara permanen.
-              </p>
-              <div className="flex justify-end gap-3">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+              <div className="flex justify-between items-center px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Konfirmasi Hapus
+                </h2>
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="px-4 py-2 text-sm rounded-md bg-gray-200 hover:bg-gray-300"
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="p-6 text-gray-700">
+                <p>
+                  Apakah Anda yakin ingin menghapus pegawai ini? Semua data
+                  terkait akan hilang permanen.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3 px-6 py-4 border-t">
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 >
                   Batal
                 </button>
                 <button
                   onClick={konfirmasiHapus}
-                  className="px-4 py-2 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                 >
                   Ya, Hapus
                 </button>

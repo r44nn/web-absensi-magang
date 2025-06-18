@@ -24,13 +24,8 @@ export default function GantiPassword() {
 
       await axios.put(
         "http://localhost:8000/api/users/change-password",
-        {
-          oldPassword,
-          newPassword,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { oldPassword, newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       toast.success("Password berhasil diubah");
@@ -43,8 +38,8 @@ export default function GantiPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F6F6] flex items-center justify-center px-4 py-12 font-sans">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
           Ganti Password
         </h2>
@@ -57,8 +52,8 @@ export default function GantiPassword() {
               type="password"
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
-              className="w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 rounded-md px-4 py-2 outline-none transition"
               required
+              className="w-full border border-gray-300 rounded-2xl px-4 py-2 focus:outline-none focus:ring transition"
             />
           </div>
 
@@ -70,8 +65,8 @@ export default function GantiPassword() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 rounded-md px-4 py-2 outline-none transition"
               required
+              className="w-full border border-gray-300 rounded-2xl px-4 py-2 focus:outline-none focus:ring transition"
             />
           </div>
 
@@ -83,21 +78,25 @@ export default function GantiPassword() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 rounded-md px-4 py-2 outline-none transition"
               required
+              className="w-full border border-gray-300 rounded-2xl px-4 py-2 focus:outline-none focus:ring transition"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-2xl shadow transition-colors duration-200"
           >
             Simpan Perubahan
           </button>
         </form>
 
-        <a href="/dashboard" className="inline-block mb-4 text-sm mt-3 text-blue-600 hover:text-blue-800 transition" > ← Kembali ke Dashboard</a>
-
+        <a
+          href="/dashboard"
+          className="block mt-4 text-sm text-blue-600 hover:text-blue-800 text-center transition"
+        >
+          ← Kembali ke Dashboard
+        </a>
       </div>
     </div>
   );
