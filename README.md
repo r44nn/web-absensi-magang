@@ -1,6 +1,12 @@
 # Web Absensi - Final Project Magang
 
 Repository ini merupakan hasil akhir dari proyek magang Muhammad Sulthan Zahran sebagai **Fullstack Developer** di **PT. Winnicode Garuda Teknologi**.
+Akun admin
+email: admin@gmail.com
+password: admin123
+
+akun user
+silahkan registrasi.
 
 ## 📌 Deskripsi Singkat
 
