@@ -1,58 +1,108 @@
-# Web Absensi - Final Project Magang
+Web Absensi - Proyek Akhir Magang
 
-Repository ini merupakan hasil akhir dari proyek magang Muhammad Sulthan Zahran sebagai **Fullstack Developer** di **PT. Winnicode Garuda Teknologi**.
-Akun admin
-email: admin@gmail.com
-password: admin123
+Proyek ini merupakan hasil akhir magang Muhammad Sulthan Zahran sebagai Fullstack Developer di PT. Winnicode Garuda Teknologi.
 
-akun user
-silahkan registrasi.
+Akun 
 
-## 📌 Deskripsi Singkat
+Admin
 
-Aplikasi **Web Absensi** ini dibangun untuk membantu perusahaan dalam mencatat dan mengelola data kehadiran karyawan secara digital, efisien, dan terintegrasi.
+Email: admin@gmail.com
 
-Project ini terdiri dari dua bagian utama:
-- **Frontend**: Dibangun menggunakan React.js dan Tailwind CSS
-- **Backend**: Dibangun menggunakan Node.js, Express.js, dan MongoDB
+Password: admin123
 
-## 🎯 Fitur Utama
+User
 
-### 🔐 Autentikasi
-- Login dan Logout menggunakan token JWT
-- Ganti password untuk user dan admin
+Silakan registrasi melalui halaman pendaftaran.
 
-### 👨‍💼 Fitur User
-- Check-in dan Check-out absensi
-- Melihat riwayat absensi pribadi
-- Mengajukan izin/cuti secara online
+📌 Deskripsi Singkat
 
-### 🛠️ Fitur Admin
-- Dashboard admin dengan tampilan ringkasan aktivitas harian
-- Melihat daftar pegawai dan menghapus akun
-- Kelola pengajuan cuti (approve/reject)
-- Riwayat absensi semua karyawan berdasarkan filter tanggal
-- Ekspor data absensi ke Excel
+Aplikasi Web Absensi membantu perusahaan mencatat dan mengelola data kehadiran karyawan secara digital, efisien, dan terintegrasi.
 
-## 🧠 Teknologi yang Digunakan
+Frontend: React.js + Tailwind CSS
 
-| Stack         | Tools/Library                        |
-|---------------|--------------------------------------|
-| Frontend      | React.js, Axios, Tailwind CSS        |
-| Backend       | Node.js, Express.js, MongoDB         |
-| Auth          | JWT (JSON Web Token), Bcrypt         |
-| Export Data   | ExcelJS                              |
+Backend: Node.js + Express.js + MongoDB
 
+🎯 Fitur Utama
 
-## 👨‍💻 Tentang Pengembang
+🔐 Autentikasi
 
-**Muhammad Sulthan Zahran**  
-Fullstack Developer (Internship)  
-Universitas Pembangunan Nasional "Veteran" Jawa Timur  
-📍 Magang di PT. Winnicode Garuda Teknologi  
-📅 Periode: 17 Februari 2025 - 17 Juni 2025
-📧 Email: ran.sulthan@gmail.com  
+Login dan logout menggunakan JWT
 
----
+Ganti password untuk user dan admin
 
-> Project ini merupakan bagian dari tugas akhir magang dan telah melalui proses analisis, perancangan, pengembangan, serta pengujian fitur secara menyeluruh.
+👨‍💼 Fitur User
+
+Check-in dan check-out absensi
+
+Melihat riwayat absensi pribadi
+
+Mengajukan izin/cuti secara online
+
+🛠️ Fitur Admin
+
+Dashboard ringkasan aktivitas harian
+
+Manajemen akun pegawai (lihat & hapus)
+
+Persetujuan/reject pengajuan cuti
+
+Filter riwayat absensi berdasarkan tanggal
+
+Ekspor data absensi ke file Excel
+
+🧰 Teknologi yang Digunakan
+
+Bagian
+
+Teknologi / Library
+
+Frontend
+
+React.js, Tailwind CSS, Axios
+
+Backend
+
+Node.js, Express.js, MongoDB
+
+Otentikasi
+
+JWT, Bcrypt
+
+Ekspor
+
+ExcelJS
+
+🚀 Instalasi & Jalankan
+
+Clone repository
+
+git clone https://github.com/r44nn/web-absensi.git
+cd web-absensi
+
+Backend
+
+cd backend
+npm install
+cp .env.example .env   # sesuaikan konfigurasi MongoDB dan JWT_SECRET
+npm run dev
+
+Frontend
+
+cd ../frontend
+npm install
+npm start
+
+Buka http://localhost:3000 di browser
+
+🧪 Pengujian
+
+Gunakan Postman atau Insomnia untuk menguji endpoint API
+
+Skrip unit testing tersedia di folder tests
+
+👨‍💻 Tentang Pengembang
+
+Muhammad Sulthan ZahranFullstack Developer (Internship)Universitas Pembangunan Nasional "Veteran" Jawa TimurPT. Winnicode Garuda TeknologiPeriode: 17 Februari 2025 – 17 Juni 2025Email: ran.sulthan@gmail.com
+
+Proyek ini telah melalui tahap analisis, perancangan, pengembangan, uji coba, dan deployment sesuai kebutuhan magang.
+
