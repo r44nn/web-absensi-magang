@@ -72,34 +72,6 @@ Ekspor
 
 ExcelJS
 
-🚀 Instalasi & Jalankan
-
-Clone repository
-
-git clone https://github.com/r44nn/web-absensi.git
-cd web-absensi
-
-Backend
-
-cd backend
-npm install
-cp .env.example .env   # sesuaikan konfigurasi MongoDB dan JWT_SECRET
-npm run dev
-
-Frontend
-
-cd ../frontend
-npm install
-npm start
-
-Buka http://localhost:3000 di browser
-
-🧪 Pengujian
-
-Gunakan Postman atau Insomnia untuk menguji endpoint API
-
-Skrip unit testing tersedia di folder tests
-
 👨‍💻 Tentang Pengembang
 
 Muhammad Sulthan ZahranFullstack Developer (Internship)Universitas Pembangunan Nasional "Veteran" Jawa TimurPT. Winnicode Garuda TeknologiPeriode: 17 Februari 2025 – 17 Juni 2025Email: ran.sulthan@gmail.com
